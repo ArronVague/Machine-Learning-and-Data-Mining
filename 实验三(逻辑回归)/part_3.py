@@ -53,10 +53,9 @@ def batch_gradient_descent(omega_init, sample, learning_rate, threshold):
     return omega
 
 
-omega_init = [1, 1, 1, 1, 1]
+omega_init = [8] * 5
 learning_rate = 0.01
 threshold = 0.0001
-
 train = np.array(train_frame)
 omega = batch_gradient_descent(omega_init, train, learning_rate, threshold)
 print(omega)
