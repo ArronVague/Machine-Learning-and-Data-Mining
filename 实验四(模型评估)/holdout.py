@@ -5,6 +5,7 @@ import math
 import matplotlib as mpl
 import warnings
 import random
+from sklearn.metrics import precision_recall_curve
 
 warnings.filterwarnings("ignore")
 
@@ -34,54 +35,78 @@ test_features = test_data.iloc[:, :-1]
 test_labels = test_data.iloc[:, -1]
 
 
-# 批量梯度下降
-def batch_gradient_descent(omega_init, features, labels, learning_rate, threshold):
-    def omega_update(omega):
-        row_len = len(features)
-        col_len = len(features[0])
-        while True:
-            omega_new = omega.copy()
-            total_list = [0] * row_len
-            for i in range(row_len):
-                wx = 0
-                for o, x in zip(omega, features[i]):
-                    wx += o * x
-                ewx = np.exp(wx)
-                # print(ewx)
-                total_list[i] = ewx / (1 + ewx) - labels[i]
-            # print(total_list)
-            for i in range(col_len):
-                s = 0
-                for j, total in enumerate(total_list):
-                    s += total * features[j][i]
-                # print(s)
-                # print(omega_new[i] - learning_rate * s / len(sample))
-                omega_new[i] = omega_new[i] - learning_rate * s / row_len
-            #     print(omega_new[i])
-            # print(omega_new)
-            if all(abs(x - y) < threshold for x, y in zip(omega_new, omega)):
-                break
-            omega = omega_new
-        return omega
-
-    omega = omega_update(omega_init)
-    return omega
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
 
-train_features.insert(0, "x0", 1)
-test_features.insert(0, "x0", 1)
+def logistic_regression(X_train, y_train, X_test):
+    # 初始化参数
+    num_features = X_train.shape[1]
+    theta = np.zeros(num_features)
 
-train_features_array = np.array(train_features)
-train_labels_array = np.array(train_labels)
+    # 使用梯度下降法训练模型
+    alpha = 0.01  # 学习率
+    num_iterations = 1000000  # 迭代次数
 
-n = len(train_features.columns)
-print(n)
+    for _ in range(num_iterations):
+        z = np.dot(X_train, theta)
+        h = sigmoid(z)
+        gradient = np.dot(X_train.T, (h - y_train)) / len(X_train)
+        theta -= alpha * gradient
 
-omega_init = [1] * n
-learning_rate = 0.01
-threshold = 0.01
+    # 在测试集上进行预测
+    y_pred = sigmoid(np.dot(X_test, theta))
+    y_pred = np.where(y_pred >= 0.5, 1, 0)
 
-omega = batch_gradient_descent(
-    omega_init, train_features_array, train_labels_array, learning_rate, threshold
-)
-print(omega)
+    return y_pred
+
+
+def accuracy(y_true, y_pred):
+    # 计算精度
+    return np.sum(y_true == y_pred) / len(y_true)
+
+
+y_pred = logistic_regression(train_features, train_labels, test_features)
+acc = accuracy(test_labels, y_pred)
+print("留出法精度：", acc)
+
+
+def precision_recall_curve(y_true, y_scores):
+    sorted_indices = np.argsort(y_scores)[::-1]  # 按正例可能性降序排列的索引
+    sorted_scores = y_scores[sorted_indices]  # 排序后的正例可能性
+    sorted_labels = y_true[sorted_indices]  # 排序后的真实标签
+
+    precision_values = []  # 存储精确率值
+    recall_values = []  # 存储召回率值
+    true_positives = 0  # 真正例数
+    false_positives = 0  # 假正例数
+    positive_count = np.sum(sorted_labels)  # 正例总数
+
+    for label in sorted_labels:
+        if label == 1:
+            true_positives += 1
+        else:
+            false_positives += 1
+
+        precision = true_positives / (true_positives + false_positives)
+        recall = true_positives / positive_count
+
+        precision_values.append(precision)
+        recall_values.append(recall)
+
+    return precision_values, recall_values
+
+
+y_test = np.array(test_labels)
+
+precision_values, recall_values = precision_recall_curve(y_test, y_pred)
+
+# 绘制查准率-查全率曲线
+plt.plot(recall_values, precision_values)
+plt.xlabel("Recall")
+plt.ylabel("Precision")
+plt.title("Precision-Recall Curve")
+plt.xlim([0, 1])
+plt.ylim([0, 1])
+plt.grid(True)
+plt.show()
