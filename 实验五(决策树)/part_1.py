@@ -36,28 +36,38 @@ def split(feature, label, d):
     return split_feature, split_label
 
 
-test_f = np.array([[0, 0, 0], [0, 0, 1], [1, 0, 2]])
-test_l = np.array([[0], [1], [2]])
-test_d = 0
+# test_f = np.array([[0, 0, 0], [0, 0, 1], [1, 0, 2]])
+# test_l = np.array([[0], [1], [2]])
+# test_d = 0
 
-test_sf, test_sl = split(test_f, test_l, test_d)
-print(test_sf, test_sl)
+# test_sf, test_sl = split(test_f, test_l, test_d)
+# print(test_sf, test_sl)
 
 
 def one_split_ID3(x_data, y_label):
-    feature_len = len(x_data[0])
-    Ent_D = entropy(y_label)
-    Gain_D = [0] * feature_len
-    for i in range(feature_len):
-        split_feature, split_label = split(x_data, y_label, i)
-        Gain_D[i] = Ent_D - sum(
-            [
-                (len(split_label[j]) / len(y_label)) * entropy(split_label[j])
-                for j in range(len(split_label))
-            ]
-        )
-    best_entropy = max(Gain_D)
-    best_dimension = Gain_D.index(max(Gain_D))
+    num_samples = len(x_data)
+    num_features = x_data.shape[1]
+    base_entropy = entropy(y_label)
+    best_entropy = 0.0
+    best_dimension = None
+
+    for feature_dim in range(num_features):
+        feature_values = x_data[:, feature_dim]
+        split_feature, split_label = split(x_data, y_label, feature_dim)
+        new_entropy = 0.0
+
+        for i in range(len(split_feature)):
+            sub_feature = split_feature[i]
+            sub_label = split_label[i]
+            p = len(sub_feature) / num_samples
+            new_entropy += p * entropy(sub_label)
+
+        information_gain = base_entropy - new_entropy
+
+        if information_gain > best_entropy:
+            best_entropy = information_gain
+            best_dimension = feature_dim
+
     return best_entropy, best_dimension
 
 
