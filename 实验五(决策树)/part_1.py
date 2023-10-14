@@ -144,14 +144,18 @@ def one_split_CART(x_data, y_label):
         for value in unique_values:
             split_label = split_by_value(feature_values, y_label, value)
             gini_index_left = gini_index(split_label)
-            gini_index_right = gini_index(y_label) - gini_index_left
+            # gini_index_right = gini_index(y_label) - gini_index_left
+            # gini_index_right = gini_index(y_label - split_label)
+            split_indices = np.where(np.isin(y_label, split_label, invert=True))
+            split_label_right = y_label[split_indices]
+            gini_index_right = gini_index(split_label_right)
             total_samples = len(y_label)
             gini_index_dimension = (
                 len(split_label) / total_samples
             ) * gini_index_left + (
                 len(y_label) - len(split_label)
             ) / total_samples * gini_index_right
-
+            print(gini_index_dimension)
             # 记录最小的基尼系数、对应的特征维数和非重复值（分类值）
             if gini_index_dimension < best_entropy:
                 best_entropy = gini_index_dimension
