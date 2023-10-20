@@ -17,56 +17,11 @@ def entropy(label):
     return ent
 
 
-# arr = np.array([[0], [1]])
-# print(entropy(arr))
-
-
-def split(feature, label, d):
-    unique_values = np.unique(feature[:, d])
-    split_feature = []
-    split_label = []
-
-    for value in unique_values:
-        indices = np.where(feature[:, d] == value)
-        split_feature.append(feature[indices])
-        split_label.append(label[indices])
-
-    return split_feature, split_label
-
-
-# test_f = np.array([[0, 0, 0], [0, 0, 1], [1, 0, 2]])
-# test_l = np.array([[0], [1], [2]])
-# test_d = 0
-
-# test_sf, test_sl = split(test_f, test_l, test_d)
-# print(test_sf, test_sl)
-
-
-def one_split_ID3(x_data, y_label):
-    num_samples = len(x_data)
-    num_features = x_data.shape[1]
-    base_entropy = entropy(y_label)
-    best_entropy = 0.0
-    best_dimension = None
-
-    for feature_dim in range(num_features):
-        feature_values = x_data[:, feature_dim]
-        split_feature, split_label = split(x_data, y_label, feature_dim)
-        new_entropy = 0.0
-
-        for i in range(len(split_feature)):
-            sub_feature = split_feature[i]
-            sub_label = split_label[i]
-            p = len(sub_feature) / num_samples
-            new_entropy += p * entropy(sub_label)
-
-        information_gain = base_entropy - new_entropy
-
-        if information_gain > best_entropy:
-            best_entropy = information_gain
-            best_dimension = feature_dim
-
-    return best_entropy, best_dimension
+"""
+【从剩余的特征集A中】寻找使得信息增益最大的特征
+输入：数据集D、剩余的特征集A
+输出：最佳划分的特征维数
+"""
 
 
 def best_split(D, A):
@@ -109,6 +64,11 @@ class Node:
         self.children[val] = node  # 为当前结点增加一个划分特征的值为val的孩子结点
 
 
+"""
+完成DTree类中的TreeGenerate、train函数以完成决策树的构建。并完成DTree类中的predict函数来用构建好的决策树来对测试数据集进行预测并输出预测准确率。
+"""
+
+
 # 决策树类
 class DTree:
     def __init__(self):
@@ -122,7 +82,6 @@ class DTree:
 
     def TreeGenerate(self, D, A):
         # 生成结点 node
-        # print("yes")
         node = Node()
 
         # if D中样本全属于同一类别C then
@@ -166,7 +125,10 @@ class DTree:
                         D[D[:, a_star] == a_star_v], A - {a_star}
                     ),  # 递归调用TreeGenerate函数
                 )
+
+        # def __init__(self, isLeaf=True, label=-1, feature_index=-1) node的构造函数中，isLeaf默认为True，feature_index默认为-1。而函数执行到这里时，node的值需要赋值为False，feature_index需要赋值为a_star
         node.isLeaf = False
+        node.feature_index = a_star
         return node
 
     """
@@ -177,7 +139,7 @@ class DTree:
     def train(self, D):
         D = np.array(D)  # 将Dataframe对象转换为numpy矩阵（也可以不转，自行决定做法）
         A = set(range(D.shape[1] - 1))  # 特征集A
-        print(A)
+
         # 记下每个特征可能的取值
         for every in A:
             self.possible_value[every] = np.unique(D[:, every])
@@ -197,10 +159,12 @@ class DTree:
         # 直至搜索到叶结点，该叶结点的标签就是数据d的预测标签
         acc_num = 0
         for d in D:
+            # print("d:", d)
             x = self.tree_root
             while not x.isLeaf:
+                # print("x.feature_index:", x.feature_index)
                 x = x.children[d[x.feature_index]]
-            print(x.label)
+            # print(x.label)
             if x.label == d[-1]:
                 acc_num += 1
         acc = acc_num / len(D)
@@ -208,23 +172,18 @@ class DTree:
 
 
 df = pd.read_csv("train_titanic.csv")
+test_df = pd.read_csv("test_titanic.csv")
 
+# 构建决策树
 tree = DTree()
 tree.train(df)
-# print(tree.tree_root)
 
-# features = ["Sex", "sibsp", "Parch", "Pclass"]
-# x_data = df[features].values
-
-# # 提取标签列
-# y_label = df["Survived"].values
-# # print(x_data)
+# 利用构建好的决策树对测试数据集进行预测，输出预测准确率（预测正确的个数 / 总数据数量）
+acc = tree.predict(test_df)
+print("预测准确率：", acc)
 
 
-# ID3_best_entropy, ID3_best_dimension = one_split_ID3(x_data, y_label)
-# print("one_split_ID3:")
-# print("最佳特征维数:", ID3_best_dimension)
-# print("最佳信息增益值:", ID3_best_entropy)
+# 展示生成的决策树结构
 def display_tree(node, indent=""):
     if node.isLeaf:
         print(indent + "Leaf Node: label =", node.label)
@@ -235,5 +194,4 @@ def display_tree(node, indent=""):
             display_tree(child, indent + "   ")
 
 
-print(tree.tree_root.isLeaf)
 display_tree(tree.tree_root)

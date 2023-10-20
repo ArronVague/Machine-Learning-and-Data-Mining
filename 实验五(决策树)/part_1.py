@@ -4,24 +4,36 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 
+'''
+使用pandas库将训练数据集'train_titanic.csv'载入到Dataframe对象中
+'''
+df = pd.read_csv("train_titanic.csv")
 
+'''
+给定任何标签数组计算其信息熵
+输入：标签数组
+输出：该数组对应的信息熵
+'''
 def entropy(label):
+    # 使用numpy中的unique实现计数
     unique_labels, label_counts = np.unique(label, return_counts=True)
     total_samples = len(label)
     ent = 0
 
     for count in label_counts:
         probability = count / total_samples
+        # 计算信息熵
         ent -= probability * np.log2(probability)
 
     return ent
 
-
-# arr = np.array([[0], [1]])
-# print(entropy(arr))
-
-
+'''
+函数功能为将所给的数据集按照指定维度的特征进行划分为若干个不同的数据集
+【输入】：特征集合，标签集合，指定维度
+【输出】：划分后所得到的子树属性集合，子树标记集合
+'''
 def split(feature, label, d):
+    # 使用numpy中的unique实现非重复值的提取
     unique_values = np.unique(feature[:, d])
     split_feature = []
     split_label = []
@@ -33,15 +45,11 @@ def split(feature, label, d):
 
     return split_feature, split_label
 
-
-# test_f = np.array([[0, 0, 0], [0, 0, 1], [1, 0, 2]])
-# test_l = np.array([[0], [1], [2]])
-# test_d = 0
-
-# test_sf, test_sl = split(test_f, test_l, test_d)
-# print(test_sf, test_sl)
-
-
+'''
+函数功能为进行【一次】决策树的结点划分，遍历找出该特征集合中信息增益(使用ID3算法中的公式计算)【最大】的特征
+输入：特征集合，标签集合
+输出：该次划分的最佳信息增益值，最佳划分维度
+'''
 def one_split_ID3(x_data, y_label):
     num_samples = len(x_data)
     num_features = x_data.shape[1]
@@ -61,14 +69,19 @@ def one_split_ID3(x_data, y_label):
             new_entropy += p * entropy(sub_label)
 
         information_gain = base_entropy - new_entropy
-
+        
+        # 记录最佳的信息增益值和对应的特征的维数
         if information_gain > best_entropy:
             best_entropy = information_gain
             best_dimension = feature_dim
 
     return best_entropy, best_dimension
 
-
+'''
+函数功能为进行【一次】决策树的结点划分，遍历找出该特征集合中信息增益率(使用C4.5算法中的公式计算)【最大】的特征
+输入：特征集合，标签集合
+输出：最佳划分的信息增益率值，对应的划分维度
+'''
 def one_split_C4_5(x_data, y_label):
     num_features = x_data.shape[1]
     best_entropy = 0.0
@@ -89,23 +102,18 @@ def one_split_C4_5(x_data, y_label):
         information_gain = entropy(y_label) - new_entropy
         gain_ratio = information_gain / intrinsic_value
 
+        # 记录最佳的信息增益率和对应的特征维数
         if gain_ratio > best_entropy:
             best_entropy = gain_ratio
             best_dimension = dimension
 
     return best_entropy, best_dimension
 
-
-# x_data = np.array([[0, "A"], [1, "B"], [1, "B"], [0, "A"], [1, "A"]])
-# y_label = np.array(["Y", "N", "N", "Y", "Y"])
-
-# # 进行一次决策树节点划分并找出信息增益率最大的特征维度
-# best_gain_ratio, best_dimension = one_split_ID3(x_data, y_label)
-
-# print("最佳信息增益率:", best_gain_ratio)
-# print("最佳划分维度:", best_dimension)
-
-
+'''
+进行【一次】决策树的结点划分，遍历找出该特征集合中基尼系数(使用CART算法中的公式计算)最小的特征以及最佳的划分值
+输入：特征集合，标签集合
+输出：最佳的基尼系数，对应的划分维度，最佳划分值
+'''
 def one_split_CART(x_data, y_label):
     def gini_index(label):
         unique_labels, label_counts = np.unique(label, return_counts=True)
@@ -136,14 +144,17 @@ def one_split_CART(x_data, y_label):
         for value in unique_values:
             split_label = split_by_value(feature_values, y_label, value)
             gini_index_left = gini_index(split_label)
-            gini_index_right = gini_index(y_label) - gini_index_left
+            split_indices = np.where(np.isin(y_label, split_label, invert=True))
+            split_label_right = y_label[split_indices]
+            gini_index_right = gini_index(split_label_right)
             total_samples = len(y_label)
             gini_index_dimension = (
                 len(split_label) / total_samples
             ) * gini_index_left + (
                 len(y_label) - len(split_label)
             ) / total_samples * gini_index_right
-
+            # print(gini_index_dimension)
+            # 记录最小的基尼系数、对应的特征维数和非重复值（分类值）
             if gini_index_dimension < best_entropy:
                 best_entropy = gini_index_dimension
                 best_dimension = dimension
@@ -151,17 +162,17 @@ def one_split_CART(x_data, y_label):
 
     return best_entropy, best_dimension, best_value
 
-
-df = pd.read_csv("train_titanic.csv")
-
-
+# 提取特征列
 features = ["Sex", "sibsp", "Parch", "Pclass"]
 x_data = df[features].values
 
 # 提取标签列
 y_label = df["Survived"].values
-# print(x_data)
 
+
+'''
+应用之前你在第4、5、6个部分编写的三个函数，在训练数据集'train_titanic.csv'上依次使用这些函数进行【一次】结点划分，并输出对应的最佳特征维数以及相应的信息增益值/信息增益率/(基尼系数和分类值)
+'''
 ID3_best_entropy, ID3_best_dimension = one_split_ID3(x_data, y_label)
 print("one_split_ID3:")
 print("最佳特征维数:", ID3_best_dimension)
