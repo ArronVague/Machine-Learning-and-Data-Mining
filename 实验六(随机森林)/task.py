@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import math
 from collections import Counter
 
 def entropy(label):
@@ -15,9 +13,23 @@ def entropy(label):
 
     return ent
 
+'''
+先从特征集 𝐴
+ 中先随机选取 𝑘
+ 个特征构成特征集 𝐴′
+ ，再从 𝐴′
+ 中选取最佳划分的特征。 𝑘
+ 一般取 𝑚𝑎𝑥{𝑙𝑜𝑔2𝑑,1}
+ ,  𝑑
+ 是 𝐴
+ 的元素的个数。你可使用特征的信息增益来决定最佳划分的特征。
+【输入】：数据集D、特征集A
+【输出】：随机特征集A'中最佳划分的特征维数
+'''
 def best_split(D, A):
     d = len(A)
     k = max(np.log2(d), 1)
+    # 随机选取k个特征
     A_prime = np.random.choice(list(A), int(k), replace=False)
 
     def split_by_value(feature, label, value):
@@ -103,15 +115,6 @@ class DTree:
         # （选择信息增益最大的特征，用到上面实现的best_split函数）
         a_star = best_split(D, A)
 
-        # for a_star 的每一个值a_star_v do
-        #     为node 生成每一个分支；令D_v表示D中在a_star上取值为a_star_v的样本子集
-        #     if D_v 为空 then
-        #         将分支结点标记为叶结点，其类别标记为D中样本最多的类
-        #     else
-        #         以TreeGenerate(D_v,A-{a_star}) 为分支结点
-        #     end if
-        # end for
-        # print("a_star:", a_star)
         if a_star is not None:
             for a_star_v in np.unique(D[:, a_star]):
                 D_v = D[D[:, a_star] == a_star_v]
@@ -151,8 +154,7 @@ class DTree:
         return
 
     """
-    predict函数对测试集D进行预测， 并输出预测准确率（预测正确的个数 / 总数据数量）
-    
+    predict(self, D)：对测试集D进行预测，要求返回数据集D的预测标签，即一个(|D|,1)矩阵（|D|行1列）。测试集中出现决策树无法划分的特征值时的情况时，对其不再进行预测，直接给定划分失败的样本标签(例如-1)。
     """
 
     def predict(self, D):
@@ -179,30 +181,34 @@ class DTree:
         return label
     
 # Bootstrap采样
-n = 10
-tree = [DTree()] * n
-for i in range(n):
-    D = np.array(train_frame)
-    D = D[np.random.choice(D.shape[0], D.shape[0], replace=True)]
-    D = pd.DataFrame(D)
-    tree[i].train(D)
-    # tree.predict(D)
-    # print("第", i + 1, "次Bootstrap采样的准确率为：", np.sum(tree.predict(D) == D[:, -1]) / len(D))
+# 生成10个决策树
+s = 0
+cur = 0
+while cur < 10:
+    n = 1000
+    tree = [DTree()] * n
+    for i in range(n):
+        D = np.array(train_frame)
+        D = D[np.random.choice(D.shape[0], D.shape[0], replace=True)]
+        D = pd.DataFrame(D)
+        tree[i].train(D)
 
-test_frame = pd.read_csv('test_titanic.csv')
-# print(len(tree))
-result = []
-for t in tree:
-    result.append(t.predict(test_frame))
+    # 测试
+    test_frame = pd.read_csv('test_titanic.csv')
+    result = []
+    for t in tree:
+        result.append(t.predict(test_frame))
 
-# 相对多数投票
-result = np.array(result)
-res = []
-for i in range(len(result[0])):
-    res.append(Counter(result[:, i]).most_common(1)[0][0])
+    # 相对多数投票
+    result = np.array(result)
+    res = []
+    for i in range(len(result[0])):
+        res.append(Counter(result[:, i]).most_common(1)[0][0])
 
-# print(res)
 
-accuracy = np.sum(res == test_frame['Survived']) / len(test_frame)
-
-print("Bootstrap采样的准确率为：", accuracy)
+    accuracy = np.sum(res == test_frame['Survived']) / len(test_frame)
+    s += accuracy
+    print("第", cur + 1, "次准确率：", accuracy)
+    cur += 1
+s /= cur
+print("平均准确率：", s)
