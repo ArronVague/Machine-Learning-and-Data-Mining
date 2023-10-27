@@ -1,3 +1,24 @@
+# 实验七：聚类
+
+两种距离计算公式的实现
+
+```py
+#曼哈顿距离
+def manhattan_distance(x, y):
+    return abs(x - y).sum()
+
+#欧式距离
+def euclidean_distance(x,y):
+    return math.sqrt(((x - y)**2).sum())
+```
+
+本次实验使用欧式距离
+
+## 算法一：原型聚类法
+
+### 代码
+
+```py
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,7 +40,7 @@ df = pd.read_csv('train.csv')
 D = np.array(df)
 
 #聚类数量
-k = 4
+k = 3
 
 #初始化每个聚类的簇心向量
 u = [None for i in range(k)]
@@ -71,7 +92,7 @@ def check_null(C):
 C = check_null(C)
 
 # 将数据集的二维特征值作为绘图的横纵坐标，将所有样本绘制到一张图中，其中同一聚类的样本点绘制为相同颜色
-plt.figure(figsize=(8, 8))
+plt.figure(figsize=(10, 10))
 plt.title('K-means')
 plt.xlabel('x')
 plt.ylabel('y')
@@ -80,3 +101,23 @@ for i in range(len(C)):
     for j in range(len(C[i])):
         plt.scatter(C[i][j][0], C[i][j][1], c=color[i], marker='o')
 plt.show()
+
+```
+
+### 结果
+
+k = 3时
+
+![](pic/K3.png)
+
+k = 4时
+
+![](pic/K4.png)
+
+直觉上，k = 3的聚类效果比k = 4好。
+
+## 算法二：密度聚类法
+
+### 代码
+
+### 结果
