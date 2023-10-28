@@ -121,3 +121,7 @@ k = 4时
 ### 代码
 
 ### 结果
+
+epsilon = 5，MinPts = 8时
+
+![](pic/e5m8.png)
