@@ -45,7 +45,7 @@ for i in range(k):
 
 #比较均值向量是否相同
 def equallist(x,y):
-    for i in rangelen(x)):
+    for i in range(len(x)):
         if not (x[i] == y[i]).all():
             return False
     return True
