@@ -68,5 +68,5 @@ Y = np.dot(W.T, X)
 # K-means聚类
 K_means(Y.T, 5)
 
-# DBSCAN(Y.T, 35000, 40)
+DBSCAN(Y.T, 35000, 40)
 # 35000, 70/50/40看起来不错
