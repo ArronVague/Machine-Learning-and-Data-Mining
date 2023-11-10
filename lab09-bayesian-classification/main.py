@@ -63,14 +63,11 @@ class Bayesian_classification:
             rec = 0
             predict = ""
             for label in self.label_count.keys():
-                # print(label)
                 p = self.pro(a[:-1], label)
                 if p >= rec:
                     rec = p
                     predict = label
-
             accuracy += 1 if predict == a[-1] else 0
-
         accuracy = accuracy / len(self.test)
         return accuracy
 
