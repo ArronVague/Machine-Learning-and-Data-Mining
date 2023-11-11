@@ -6,6 +6,7 @@ import math
 
 
 class Bayesian_classification:
+    # 接受np.array类型的训练集和测试集，初始化各种参数
     def __init__(self, train, test):
         self.train = train
         self.test = test
@@ -21,16 +22,19 @@ class Bayesian_classification:
         self.priori_probability = {}
         self.conditional_probability = {}
 
+    # 计算先验概率
     def cal_priori_probability(self):
         for k, v in self.label_count.items():
             self.priori_probability[k] = v / self.Dy
 
+    # 计算先验概率，使用拉普拉斯平滑
     def cal_priori_probability_laplacian_smoothing(self):
         for k, v in self.label_count.items():
             self.priori_probability[k] = (v + 1) / (
                 self.Dy + self.label_count.keys().__len__()
             )
 
+    # 计算条件概率
     def cal_conditional_probability(self):
         for i in range(self.num_feature):
             for feature in self.feature_unique[i]:
@@ -40,6 +44,7 @@ class Bayesian_classification:
                         self.D[k]
                     )
 
+    # 计算条件概率，使用拉普拉斯平滑
     def cal_conditional_probability_laplacian_smoothing(self):
         for i in range(self.num_feature):
             for feature in self.feature_unique[i]:
@@ -49,6 +54,7 @@ class Bayesian_classification:
                         len(self.D[k]) + self.feature_unique[i].__len__()
                     )
 
+    # 给定样本以及标签，计算其后验概率
     def pro(self, a, index):
         res = self.priori_probability[index]
         for i, x in enumerate(a):
@@ -57,6 +63,7 @@ class Bayesian_classification:
             res *= self.conditional_probability[(i, x, index)]
         return res
 
+    # 预测测试集，返回准确率
     def predict(self):
         accuracy = 0
         for a in self.test:
@@ -72,7 +79,6 @@ class Bayesian_classification:
         return accuracy
 
 
-# p代表有毒，e代表无毒
 train_df = pd.read_csv("train_mushroom.csv")
 test_df = pd.read_csv("test_mushroom.csv")
 
