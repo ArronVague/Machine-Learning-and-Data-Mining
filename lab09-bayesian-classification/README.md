@@ -7,12 +7,11 @@ $$
 P(y)=\frac{|D_y|}{|D|}
 $$
 
-
 1. 先验概率
 
    引入拉普拉斯平滑之前，先验概率的计算公式为：
    $$
-   P(y)=\frac{|D_y|}{|D|}
+   \frac{\partial J}{\partial \omega_j}=\frac{1}{m}\sum_{i=1}^m x_{ij}(\frac{e^{\omega^T x_i}}{1+e^{\omega^T x_i}}-y_i)
    $$
    
 
