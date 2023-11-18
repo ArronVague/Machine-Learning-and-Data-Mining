@@ -1,17 +1,14 @@
-from collections import Counter
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import math
-import random
 
-# 将数据集'height.csv'载入并转换为numpy数组
+# 将数据集'data.csv'载入并转换为numpy数组
 D = pd.read_csv("data.csv")
 D = np.array(D)
 
 # parameter = [alpha1, alpha2, mu1, mu2, sigma1, sigma2]
 # 初始化参数
-parameter = [0.625, 0.375, 175, 165, 4, 6]
+parameter = [0.5, 0.5, 10, 300, 10, 10]
 
 
 # 概率密度函数 f(x|theta)
@@ -93,8 +90,10 @@ def sigma_expection(D, parameter, mu_next_1, mu_next_2):
 # 每轮参数更新的差值小于阈值
 
 threshold = 0.0001
+cnt = 0
 
 while True:
+    cnt += 1
     record = parameter.copy()
     alpha_expection(D, parameter)
     mu_expection(D, parameter)
@@ -102,7 +101,9 @@ while True:
     mu_next_1 = parameter[2]
     mu_next_2 = parameter[3]
     sigma_expection(D, parameter, mu_next_1, mu_next_2)
+
     print(parameter)
 
     if all([abs(record[i] - parameter[i]) < threshold for i in range(len(parameter))]):
+        print("迭代次数：", cnt)
         break
