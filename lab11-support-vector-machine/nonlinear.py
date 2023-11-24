@@ -46,4 +46,8 @@ sol = solvers.qp(P, q, G, h, A, b)
 lamda_star = np.array(sol["x"])
 print(lamda_star)
 
-b_star = Y[j] - sum(lamda_star[i] * Y[i] * K(X[i], X[j]))
+b_star = [
+    Y[j] - sum(lamda_star[i] * Y[i] * K(X[i], X[j]) for i in range(len(X)))
+    for j in range(len(X))
+    if 0 < lamda_star[j] < C
+]
