@@ -45,3 +45,5 @@ b = matrix(0.0)
 sol = solvers.qp(P, q, G, h, A, b)
 lamda_star = np.array(sol["x"])
 print(lamda_star)
+
+b_star = Y[j] - sum(lamda_star[i] * Y[i] * K(X[i], X[j]))
