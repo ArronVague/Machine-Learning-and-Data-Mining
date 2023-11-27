@@ -83,7 +83,53 @@ plt.show()
 
 ### 代码
 
+代码构成与线性可分大致相同，这里只给出不同部分的代码。
+
+```python
+...
+
+# 读入数据集并转换成np.double类型，画出数据集的散点图
+...
+
+# 求出二次规划问题中的P，q，G，h，A，b矩阵，并设置参数c=1
+X = dataset2[:, 0:2]
+...
+G = matrix(np.zeros((2 * len(X), len(X))))
+for i in range(len(X)):
+    G[i, i] = -1
+for i in range(len(X)):
+    G[i + len(X), i] = 1
+h = matrix(np.zeros(2 * len(X)))
+C = 1
+for i in range(len(X)):
+    h[i + len(X)] = C
+...
+
+# 求出omega_star和b_star，设置阈值threshold=1e-5，筛去非常靠近0和C的分量
+threshold = 1e-5
+omega_star = sum(lamda_star[i] * Y[i] * X[i] for i in range(len(X)))
+b_star = [
+    Y[i] - np.dot(omega_star.T, X[i])
+    for i in range(len(X))
+    if threshold < lamda_star[i] < C - threshold
+]
+
+# 画出数据集的散点图、决策边界和间隔边界
+...
+
+```
+
 ### 结果
+
+![dataset_2](pic/dataset_2.png)
+
+观察样本的分布，训练样本难以完全线性可分。
+
+![answer_2](pic/answer_2.png)
+
+上图为C = 1，threshold = 1e-5时的结果，C在[1, 2)区间的结果完全相同，C = 2时就无法求出更多的b*了。
+
+引入了松弛变量，允许一些样本不满足条件，因此可以看到一些支持向量在两个间隔边界之间。红色样本误分的数量为2，绿色样本误分的数量为1。
 
 ## 非线性支持向量机与核函数
 
