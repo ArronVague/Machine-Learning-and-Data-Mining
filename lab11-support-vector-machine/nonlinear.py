@@ -6,26 +6,15 @@ import cvxopt
 from cvxopt import matrix
 from cvxopt import solvers
 
-# Q = 2 * matrix([[2, 0.5], [0.5, 1]])
-# p = matrix([1.0, 1.0])
-# G = matrix([[-1.0, 0.0], [0.0, -1.0]])
-# h = matrix([0.0, 0.0])
-# A = matrix([1.0, 1.0], (1, 2))
-# b = matrix(1.0)
-# sol = solvers.qp(Q, p, G, h, A, b)
-# print(sol["x"])
-
+# 读入数据集并转换成np.double类型，画出数据集的散点图
 Raisin_train = pd.read_csv("Raisin_train.csv")
-# 将数据类型转换成np.double
 Raisin_train = np.array(Raisin_train, dtype=np.double)
 
 X = Raisin_train[:, 0:7]
-# print(X)
 Y = Raisin_train[:, 7]
 
 
-# print(Y)
-# 使用核函数求P矩阵
+# 求出二次规划问题中的P，q，G，h，A，b矩阵，并设置参数c=1
 def K(x, z):
     return np.dot(x.T, z)
 
@@ -35,16 +24,8 @@ for i in range(len(X)):
     for j in range(len(X)):
         P[i, j] = Y[i] * Y[j] * K(X[i], X[j])
 
-# # 硬间隔
-# q = matrix(-1 * np.ones(len(X)))
-# G = matrix(-1 * np.eye(len(X)))
-# h = matrix(np.zeros(len(X)))
-# A = matrix(Y.reshape(1, -1))
-# b = matrix(0.0)
-
 # 软间隔
 q = matrix(-1 * np.ones(len(X)))
-# 创建一个2m*m的矩阵
 G = matrix(np.zeros((2 * len(X), len(X))))
 for i in range(len(X)):
     G[i, i] = -1
@@ -58,15 +39,16 @@ A = matrix(Y.reshape(1, -1))
 b = matrix(0.0)
 sol = solvers.qp(P, q, G, h, A, b)
 lamda_star = np.array(sol["x"])
-# print(lamda_star)
 
+# 求出b_star，设置阈值threshold=1e-5，筛去非常靠近0的分量
+threshold = 1e-5
 b_star = [
     Y[j] - sum(lamda_star[i] * Y[i] * K(X[i], X[j]) for i in range(len(X)))
     for j in range(len(X))
-    if 1e-5 < lamda_star[j] < C - 1e-5
+    if threshold < lamda_star[j] < C - threshold
 ]
-print(b_star)
 
+# 读入测试集，用分类决策函数进行预测，输出预测准确率
 Raision_test = pd.read_csv("Raisin_test.csv")
 Raision_test = np.array(Raision_test, dtype=np.double)
 
@@ -81,4 +63,5 @@ acc = 0
 for i in range(len(Raision_test)):
     if f(Raision_test[i, 0:7]) == Raision_test[i, 7]:
         acc += 1
-print(acc / len(Raision_test))
+print("C：", C)
+print("预测准确率：", acc / len(Raision_test))
