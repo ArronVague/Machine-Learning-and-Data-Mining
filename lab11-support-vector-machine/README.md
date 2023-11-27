@@ -1,3 +1,10 @@
+# 实验十一：支持向量机
+
+## 线性可分支持向量机与硬间隔最大化
+
+### 代码
+
+```python
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -59,3 +66,28 @@ plt.contour(x1, x2, y0, [0], colors="red")
 plt.contour(x1, x2, y1, [1], colors="black", linestyles="dashed")
 plt.contour(x1, x2, y2, [-1], colors="black", linestyles="dashed")
 plt.show()
+
+```
+
+### 结果
+
+![dataset_1](pic/dataset_1.png)
+
+观察样本的分布，必定存在某个超平面 $\mathbf{\omega}^T\mathbf{x}+b=0$ ，能够将数据集的正实例点和负实例点完全正确地划分到超平面的两侧。
+
+![answer_1](pic/answer_1.png)
+
+求解出的超平面完美地将数据集的正实例点和负实例点完全正确地划分两侧。
+
+## 线性支持向量机与软间隔最大化
+
+### 代码
+
+### 结果
+
+## 非线性支持向量机与核函数
+
+### 代码
+
+### 结果
+
