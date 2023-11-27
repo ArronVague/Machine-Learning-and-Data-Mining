@@ -48,7 +48,7 @@ b_star = [
     if lamda_star[i] > threshold
 ]
 
-# 画出数据集的散点图与间隔边界
+# 画出数据集的散点图、决策边界和间隔边界
 for i in range(len(plot_y)):
     if lamda_star[i] > threshold:
         plt.scatter(plot_x1[i], plot_x2[i], c="b", marker="o")
