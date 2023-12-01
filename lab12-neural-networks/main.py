@@ -16,7 +16,7 @@ wine_test = pd.read_csv("wine_test.csv")
 # 利用线性层和激活函数搭建一个神经网络，要求输入和输出维度与数据集维度一致，而神经网络深度、隐藏层大小、激活函数种类等超参数自行调整。
 # 输入维度为11
 input_dim = wine_train.shape[1] - 1
-hidden_dim = 5
+hidden_dim = 100
 output_dim = 1
 # print(input_dim)
 
@@ -49,10 +49,12 @@ criterion = nn.MSELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
 
-Epoch = 1000
+Epoch = 200
+
+dot = []
 
 for epoch in range(Epoch):
-    print("Epoch:", epoch)
+    # print("Epoch:", epoch)
     # 读取训练数据集的特征和标签
     train_features = torch.tensor(wine_train.iloc[:, 0:11].values)
     train_labels = torch.tensor(wine_train.iloc[:, 11].values)
@@ -95,9 +97,18 @@ for epoch in range(Epoch):
     # 计算测试集上的准确率
     test_output1, test_output2 = net(test_features)
     test_loss = criterion(test_output2, test_labels)
-    print("Test loss:", test_loss.item())
+    # print("Test loss:", test_loss.item())
 
     # 计算训练集上的准确率
     train_output1, train_output2 = net(train_features)
     train_loss = criterion(train_output2, train_labels)
-    print("Train loss:", train_loss.item())
+    # print("Train loss:", train_loss.item())
+
+    dot.append([train_loss.item(), test_loss.item()])
+
+# 画出训练损失和测试损失关于迭代轮数的折线图
+dot = np.array(dot)
+plt.plot(dot[:, 0], label="Train loss")
+plt.plot(dot[:, 1], label="Test loss")
+plt.legend()
+plt.show()
