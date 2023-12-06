@@ -50,7 +50,6 @@ while hidden_dim > 0:
     # 创建神经网络模型实例
     net = Net(input_dim, hidden_dim, output_dim)
     # print(net)
-    net.eval()
 
     # 定义损失函数和优化器
     criterion = nn.MSELoss()
