@@ -19,6 +19,7 @@ wine_test = pd.read_csv("wine_test.csv")
 input_dim = wine_train.shape[1] - 1
 hidden_dim = 11
 output_dim = 1
+num_colors = hidden_dim
 # print(input_dim)
 
 
@@ -108,9 +109,7 @@ def generate_colors(num_colors):
     return colors
 
 
-num_colors = 11
 distinct_colors = generate_colors(num_colors)
-
 
 # 画出训练损失和测试损失关于迭代轮数的折线图
 dot = np.array(dot)
