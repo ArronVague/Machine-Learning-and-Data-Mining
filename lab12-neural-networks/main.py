@@ -7,6 +7,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Function
 import os
+import colorsys
 
 #  读入训练数据集'wine_train.csv'与测试数据集'wine_test.csv'。
 wine_train = pd.read_csv("wine_train.csv")
@@ -16,7 +17,7 @@ wine_test = pd.read_csv("wine_test.csv")
 # 利用线性层和激活函数搭建一个神经网络，要求输入和输出维度与数据集维度一致，而神经网络深度、隐藏层大小、激活函数种类等超参数自行调整。
 # 输入维度为11
 input_dim = wine_train.shape[1] - 1
-hidden_dim = 100
+hidden_dim = 11
 output_dim = 1
 # print(input_dim)
 
@@ -40,75 +41,91 @@ class Net(nn.Module):
         return out1, out2
 
 
-# 创建神经网络模型实例并输出
-net = Net(input_dim, hidden_dim, output_dim)
-# print(net)
+dot = [[] for _ in range(hidden_dim)]
 
-# 定义损失函数和优化器
-criterion = nn.MSELoss()
-optimizer = optim.SGD(net.parameters(), lr=0.01)
+# 训练周期
+Epoch = 120
+
+while hidden_dim > 0:
+    # 创建神经网络模型实例
+    net = Net(input_dim, hidden_dim, output_dim)
+    # print(net)
+
+    # 定义损失函数和优化器
+    criterion = nn.MSELoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.01)
+
+    for epoch in range(Epoch):
+        # print("Epoch:", epoch)
+        # 读取训练数据集的特征和标签
+        train_features = torch.tensor(wine_train.iloc[:, 0:11].values)
+        train_labels = torch.tensor(wine_train.iloc[:, 11].values)
+        train_features = train_features.float()
+        train_labels = train_labels.float()
+
+        # 读取测试数据集的特征和标签
+        test_features = torch.tensor(wine_test.iloc[:, 0:11].values)
+        test_labels = torch.tensor(wine_test.iloc[:, 11].values)
+        test_features = test_features.float()
+        test_labels = test_labels.float()
+
+        # 前向传播
+        output1, output2 = net(train_features)
+
+        # 计算损失
+        loss = criterion(output2, train_labels)
+
+        # 梯度清零
+        optimizer.zero_grad()
+
+        # 反向传播
+        loss.backward()
+
+        # 更新参数
+        optimizer.step()
+
+        # 计算测试集上的准确率
+        test_output1, test_output2 = net(test_features)
+        test_loss = criterion(test_output2, test_labels)
+
+        # 计算训练集上的准确率
+        train_output1, train_output2 = net(train_features)
+        train_loss = criterion(train_output2, train_labels)
+
+        dot[hidden_dim - 1].append([train_loss.item(), test_loss.item()])
+
+        # dot.append([hidden_dim, train_loss.item(), test_loss.item()])
+
+    hidden_dim -= 1
 
 
-Epoch = 200
+def generate_colors(num_colors):
+    colors = []
+    for i in range(num_colors):
+        hue = i / num_colors
+        rgb = colorsys.hsv_to_rgb(hue, 0.8, 0.8)
+        colors.append(tuple(int(c * 255) for c in rgb))
+    return colors
 
-dot = []
 
-for epoch in range(Epoch):
-    # print("Epoch:", epoch)
-    # 读取训练数据集的特征和标签
-    train_features = torch.tensor(wine_train.iloc[:, 0:11].values)
-    train_labels = torch.tensor(wine_train.iloc[:, 11].values)
-    train_features = train_features.float()
-    train_labels = train_labels.float()
-    # print(train_features)
-    # print(train_labels)
-    # print(train_features.shape)
-    # print(train_labels.shape)
+num_colors = 11
+distinct_colors = generate_colors(num_colors)
 
-    # 读取测试数据集的特征和标签
-    test_features = torch.tensor(wine_test.iloc[:, 0:11].values)
-    test_labels = torch.tensor(wine_test.iloc[:, 11].values)
-    test_features = test_features.float()
-    test_labels = test_labels.float()
-    # print(test_features)
-    # print(test_labels)
-    # print(test_features.shape)
-    # print(test_labels.shape)
-
-    # 进行一次forward()前向传播
-    # 这是PyTorch中的一种简便写法，等价于net.forward(input)
-    output1, output2 = net(train_features)
-
-    # 计算损失函数
-    loss = criterion(output2, train_labels)
-
-    # 清空梯度
-    optimizer.zero_grad()
-
-    # 反向传播
-    loss.backward()
-
-    # 更新参数
-    optimizer.step()
-
-    # 输出损失函数值
-    # print("Loss:", loss.item())
-
-    # 计算测试集上的准确率
-    test_output1, test_output2 = net(test_features)
-    test_loss = criterion(test_output2, test_labels)
-    # print("Test loss:", test_loss.item())
-
-    # 计算训练集上的准确率
-    train_output1, train_output2 = net(train_features)
-    train_loss = criterion(train_output2, train_labels)
-    # print("Train loss:", train_loss.item())
-
-    dot.append([train_loss.item(), test_loss.item()])
 
 # 画出训练损失和测试损失关于迭代轮数的折线图
 dot = np.array(dot)
-plt.plot(dot[:, 0], label="Train loss")
-plt.plot(dot[:, 1], label="Test loss")
+for i in range(dot.shape[0]):
+    plt.plot(
+        dot[i, :, 0],
+        label="Train loss when hidden_dim = " + str(i + 1),
+        color=[c / 255.0 for c in distinct_colors[i]],
+        linestyle="--",
+    )
+    plt.plot(
+        dot[i, :, 1],
+        label="Test loss when hidden_dim = " + str(i + 1),
+        color=[c / 255.0 for c in distinct_colors[i]],
+        linestyle="-",
+    )
 plt.legend()
 plt.show()
