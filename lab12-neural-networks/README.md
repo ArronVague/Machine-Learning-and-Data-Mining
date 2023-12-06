@@ -1,3 +1,10 @@
+# 实验十二：神经网络
+
+## 代码
+
+为了避免一次又一次地修改隐藏层大小`hidden_dim`这一参数，将其初始化为输入维度，迭代完成后，自减1，继续迭代。直到`hidden_dim == 0`为止。也能更直观地看到隐藏层大小不同时，训练损失和测试损失的变化情况。
+
+```python
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -50,7 +57,6 @@ while hidden_dim > 0:
     # 创建神经网络模型实例
     net = Net(input_dim, hidden_dim, output_dim)
     # print(net)
-    net.eval()
 
     # 定义损失函数和优化器
     criterion = nn.MSELoss()
@@ -60,13 +66,13 @@ while hidden_dim > 0:
         # print("Epoch:", epoch)
         # 读取训练数据集的特征和标签
         train_features = torch.tensor(wine_train.iloc[:, 0:11].values)
-        train_labels = torch.tensor(wine_train.iloc[:, 11].values).view(-1, 1)
+        train_labels = torch.tensor(wine_train.iloc[:, 11].values)
         train_features = train_features.float()
         train_labels = train_labels.float()
 
         # 读取测试数据集的特征和标签
         test_features = torch.tensor(wine_test.iloc[:, 0:11].values)
-        test_labels = torch.tensor(wine_test.iloc[:, 11].values).view(-1, 1)
+        test_labels = torch.tensor(wine_test.iloc[:, 11].values)
         test_features = test_features.float()
         test_labels = test_labels.float()
 
@@ -128,3 +134,11 @@ for i in range(dot.shape[0]):
     )
 plt.legend()
 plt.show()
+
+```
+
+
+
+## 结果
+
+## 总结
