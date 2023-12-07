@@ -38,3 +38,31 @@ print("z_3 = ", z_3)
 a_3 = sigmoid(z_3)
 
 print("a_3 = ", a_3)
+
+y = np.array([(0.15 + 0.7) / 2, 0.7])
+
+L_a_3 = a_3 - y
+print("L_a_3 = ", L_a_3)
+
+
+def sigmoid_derivative(z):
+    return sigmoid(z) * (1 - sigmoid(z))
+
+
+sd_prime_3 = sigmoid_derivative(z_3)
+print("sd_prime_3 = ", sd_prime_3)
+
+l_z_3 = L_a_3 * sd_prime_3
+print("l_z_3 = ", l_z_3)
+
+sd_prime_2 = sigmoid_derivative(z_2)
+print("sd_prime_2 = ", sd_prime_2)
+
+l_z_2 = omega_3.T.dot(l_z_3) * sd_prime_2
+print("l_z_2 = ", l_z_2)
+
+sd_prime_1 = sigmoid_derivative(z_1)
+print("sd_prime_1 = ", sd_prime_1)
+
+l_z_1 = omega_2.T.dot(l_z_2) * sd_prime_1
+print("l_z_1 = ", l_z_1)
