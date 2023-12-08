@@ -66,13 +66,13 @@ while hidden_dim > 0:
         # print("Epoch:", epoch)
         # 读取训练数据集的特征和标签
         train_features = torch.tensor(wine_train.iloc[:, 0:11].values)
-        train_labels = torch.tensor(wine_train.iloc[:, 11].values)
+        train_labels = torch.tensor(wine_train.iloc[:, 11].values).view(-1, 1)
         train_features = train_features.float()
         train_labels = train_labels.float()
 
         # 读取测试数据集的特征和标签
         test_features = torch.tensor(wine_test.iloc[:, 0:11].values)
-        test_labels = torch.tensor(wine_test.iloc[:, 11].values)
+        test_labels = torch.tensor(wine_test.iloc[:, 11].values).view(-1, 1)
         test_features = test_features.float()
         test_labels = test_labels.float()
 
@@ -152,3 +152,7 @@ plt.show()
 但毫无疑问，随着迭代次数的增加，损失率越来越小，最终趋于稳定。
 
 ## 总结
+
+准确来说神经网络只要两个隐藏层就可以拟合任意函数，隐藏层更多的就属于深度学习的一些算法了。前向传播是神经网络一种最基础的形式，比如BP网络，具体就是指神经元之间只有前向通道，不存在反馈连接，同层的神经元相互独立。反向传播准确来说是误差反向传播，其实就是当前层的残差等于后一层残差的加权组合。
+
+完成理论作业2能帮助我们更好地理解神经网络的前向传播和反向传播。
