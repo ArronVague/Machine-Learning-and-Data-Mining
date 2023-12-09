@@ -84,3 +84,7 @@ print("b_2 = ", b_2)
 
 omega_1 = omega_1 - learning_rate * l_z_1.reshape(3, 1).dot(a_0.reshape(1, 2))
 print("omega_1 = ", omega_1)
+
+b_1 = b_1 - learning_rate * l_z_1
+
+print("b_1 = ", b_1)
