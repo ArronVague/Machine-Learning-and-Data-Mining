@@ -241,7 +241,7 @@ When $l = 1$ :
 
 \[
     \begin{aligned}
-        \delta^{[2]} & = \frac{\partial L}{\partial z^{[2]}} = \omega^{[3]T}\cdot dz^{[3]}*\sigma^{[2]'}(z^{[2]}) \\
+        \delta^{[2]} & = \frac{\partial L}{\partial z^{[2]}} = \omega^{[3]\mathsf{T}}\cdot dz^{[3]}*\sigma^{[2]'}(z^{[2]}) \\
                      & = \begin{bmatrix}
                              0.4 & 0.6 \\
                              0.3 & 0.2 \\
@@ -269,7 +269,7 @@ When $l = 1$ :
 
 \[
     \begin{aligned}
-        \delta^{[1]} & = \frac{\partial L}{\partial z^{[1]}} = \omega^{[2]T}\cdot dz^{[2]}*\sigma^{[1]'}(z^{[1]}) \\
+        \delta^{[1]} & = \frac{\partial L}{\partial z^{[1]}} = \omega^{[2]\mathsf{T}}\cdot dz^{[2]}*\sigma^{[1]'}(z^{[1]}) \\
                      & = \begin{bmatrix}
                              0.9 & 0.6 & 0.1 \\
                              0.2 & 0.3 & 0.8 \\
@@ -310,7 +310,7 @@ When $l = 3$ :
 
 \[
     \begin{aligned}
-        \omega^{[3]} & =\omega^{[3]}-\eta\delta^{[3]}a^{[2]T} \\
+        \omega^{[3]} & =\omega^{[3]}-\eta\delta^{[3]}a^{[2]\mathsf{T}} \\
                      & =\begin{bmatrix}
                             % [0.4, 0.3, 0.5], [0.6, 0.2, 0.8]
                             0.4 $ 0.3 $ 0.5 \\
@@ -326,7 +326,7 @@ When $l = 3$ :
             0.74847271 \\
             0.72496399 \\
             0.70145065 \\
-        \end{bmatrix}^{\mathsf{T}}                      \\
+        \end{bmatrix}^{\mathsf{T}}                               \\
                      & = \begin{bmatrix}
                              % [0.36517361 0.26626747 0.46736154]
                              %  [0.59340484 0.19361199 0.79381918]
@@ -360,7 +360,7 @@ When $l = 3$ :
 
 \[
     \begin{aligned}
-        \omega^{[2]} & =\omega^{[2]}-\eta\delta^{[2]}a^{[1]T} \\
+        \omega^{[2]} & =\omega^{[2]}-\eta\delta^{[2]}a^{[1]\mathsf{T}} \\
                      & =\begin{bmatrix}
                             % [0.9, 0.2, 0.7], [0.6, 0.3, 0.7], [0.1, 0.8, 0.5]
                             0.9 $ 0.2 $ 0.7 \\
@@ -378,7 +378,7 @@ When $l = 3$ :
             0.61052035 \\
             0.61892785 \\
             0.59604195 \\
-        \end{bmatrix}^{\mathsf{T}}                      \\
+        \end{bmatrix}^{\mathsf{T}}                               \\
                      & = \begin{bmatrix}
                              % [0.89725313 0.1972153  0.69731827]
                              %  [0.59808621 0.29805986 0.6981316 ]
@@ -417,7 +417,7 @@ When $l = 3$ :
 
 \[
     \begin{aligned}
-        \omega^{[1]} & =\omega^{[1]}-\eta\delta^{[1]}a^{[0]T} \\
+        \omega^{[1]} & =\omega^{[1]}-\eta\delta^{[1]}a^{[0]\mathsf{T}} \\
                      & =\begin{bmatrix}
                             0.1 & 0.8 \\
                             0.4 & 0.6 \\
@@ -433,7 +433,7 @@ When $l = 3$ :
             % 0.455 0.505
             0.455 \\
             0.505 \\
-        \end{bmatrix}^{\mathsf{T}}                      \\
+        \end{bmatrix}^{\mathsf{T}}                               \\
                      & = \begin{bmatrix}
                              % 0.09928972 0.79921167]
                              %  [0.3992575  0.59917591]
