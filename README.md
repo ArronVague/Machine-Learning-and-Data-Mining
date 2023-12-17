@@ -2,17 +2,17 @@
 
 A repo to store the code of SYSU's Machine Learning and Data Mining Laboratory.
 
-## 遇到的各种问题
+**大作业仓库链接**
 
-### `vscode`自动深色模式
-
-设置搜索auto detect color scheme，勾上
+[Los-Angeles-Crime](https://github.com/ArronVague/Los-Angeles-Crime)
 
 ## Complaints
 
 Do not use '-' in the file name. 
 
 ## 大作业 Dataset
+
+最终都没采纳。
 
 [Spotify Tracks Genre](https://www.kaggle.com/datasets/thedevastator/spotify-tracks-genre-dataset)
 
